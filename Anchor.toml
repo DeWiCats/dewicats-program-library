@@ -1,22 +1,30 @@
 [features]
 seeds = true
-skip-lint = false
+
 [programs.localnet]
-anchor_nft_staking = "H8mqZ2WTKWFvCunvN5VjQKdu9eDere8mydm5HkFA7ZVz"
+fanout = "fanqeMu3fw8R4LwKNbahPtYXJsyLL6NXyfe2BqzhfB6"
+
+[workspace]
+members = [
+  "programs/fanout"
+]
 
 [registry]
-url = "https://api.apr.dev"
+url = "https://anchor.projectserum.com"
 
 [provider]
 cluster = "localnet"
-wallet = "/Users/peronif5/.config/solana/id2.json"
+wallet = "~/.config/solana/id.json"
 
 [scripts]
-test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"
+test = "yarn run ts-mocha -p ./tsconfig.test.json -t 1000000 tests/**/*.ts"
+build-deps = "anchor run build-metadata"
+build-metadata = "cd deps/metaplex-program-library/token-metadata/program && pwd && cargo build-bpf && cd ../../../../"
 
 ## Necessary for test validator
 [test.validator]
 url = "https://api.devnet.solana.com"
+
 [test]
 startup_wait = 20000
 
