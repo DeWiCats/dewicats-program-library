@@ -16,9 +16,7 @@
   ],
   "private": true,
   "dependencies": {
-    "@clockwork-xyz/sdk": "^0.3.0",
-    "@coral-xyz/anchor": "^0.26.0",
-    "@helium/hydra-sdk": "^0.0.48-hydra.1",
+    "@coral-xyz/anchor": "^0.28.0",
     "@helium/spl-utils": "^0.0.48",
     "@metaplex-foundation/js": "^0.17.12",
     "@metaplex-foundation/mpl-token-metadata": "2.9.1",
@@ -26,7 +24,6 @@
     "@solana/spl-token": "^0.3.7",
     "@solana/web3.js": "^1.74.0",
     "@sqds/sdk": "^2.0.4",
-    "@switchboard-xyz/solana.js": "^2.1.3",
     "lerna": "^5.5.4",
     "yargs": "yargs/yargs"
   },

@@ -6,7 +6,7 @@ fanout = "fanqeMu3fw8R4LwKNbahPtYXJsyLL6NXyfe2BqzhfB6"
 
 [workspace]
 members = [
-  "programs/fanout"
+  "programs/stake-manager"
 ]
 
 [registry]

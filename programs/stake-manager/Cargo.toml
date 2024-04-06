@@ -1,0 +1,31 @@
+[package]
+name = "stake-manager"
+version = "0.1.0"
+description = "Created with Anchor"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "stake_manager"
+
+[features]
+devnet = []
+no-genesis = []
+no-entrypoint = []
+no-idl = []
+no-log-ix-name = []
+cpi = ["no-entrypoint"]
+default = []
+
+[profile.release]
+overflow-checks = true
+
+[dependencies]
+bs58 = "0.3.1"
+anchor-lang = { workspace = true }
+anchor-spl = { workspace = true }
+mpl-token-metadata = { workspace = true }
+shared-utils = { workspace = true }
+solana-security-txt = { workspace = true }
+default-env = { workspace = true }
+
