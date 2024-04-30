@@ -5,7 +5,7 @@
       "path": "./packages/idls"
     },
     {
-      "path": "./packages/fanout-sdk"
+      "path": "./packages/auction-manager-sdk"
     }
   ]
 }

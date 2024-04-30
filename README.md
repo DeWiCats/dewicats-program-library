@@ -1,10 +1,8 @@
 # DeWiCats Program Library
 
-A collection of solana programs used for Helium's Solana integration
+A collection of solana programs used for DeWiCats.
 
 # [DeWiCats Program Library](https://dewicats.xyz/)
-
-Frontend for DewiCats DAO
 
 ## Local Setup
 
@@ -38,3 +36,5 @@ Filter by ["good first issue"](https://github.com/DeWiCats/dewicats-program-libr
 Once you submit a PR, our CI will generate a temporary testing URL where you can validate your changes. Tag any of the gatekeepers on the review to merge them into master.
 
 _**NOTE**_: For big changes associated with feature releases/milestones, they will be merged onto the `develop` branch for more thorough QA before a final merge to `main`
+
+cargo install --git https://github.com/coral-xyz/anchor/tree/4e5280be46d859ba1c57fabe4c3916bec742fd69 anchor-cli --locked
