@@ -12,6 +12,7 @@ import { IDL } from "../packages/idls/lib/cjs/auction_manager";
 import {
   bidderRecieptKey,
   init as initAuctionManager,
+  referralRecipientKey,
 } from "../packages/auction-manager-sdk/src";
 const { expect } = chai;
 import chaiAsPromised from "chai-as-promised";
@@ -211,7 +212,7 @@ describe("auction-manager", () => {
 
       await bidderProvider.sendAndConfirm(signedInitBidTxn);
 
-      const bidReciept = bidderRecieptKey(listing)[0];
+      const bidReciept = bidderRecieptKey(listing, bidderKeypir.publicKey)[0];
 
       let bidRecieptAcc = await auctionProgram.account.bidRecieptV0.fetch(
         bidReciept
@@ -256,8 +257,89 @@ describe("auction-manager", () => {
       expect(newBidRecieptAcc.listing.toBase58()).to.eq(listing.toBase58());
     });
 
+    it("allows to initialize referral recipient", async () => {
+      const {
+        pubkeys: { referralRecipient },
+      } = await auctionProgram.methods
+        .initializeReferralRecipientV0({
+          referralCode: "PERONI",
+        })
+        .accounts({
+          listing,
+          auctionManager,
+          nft: mint,
+        })
+        .rpcAndKeys({ skipPreflight: true });
+
+      if (!referralRecipient) {
+        throw new Error("Referral recipient not found");
+      }
+
+      const referralRecipientAcc =
+        await auctionProgram.account.referralRecipientV0.fetch(
+          referralRecipient
+        );
+
+      expect(referralRecipientAcc.referralCode).to.eq("PERONI");
+      expect(referralRecipientAcc.nft.toBase58()).to.eq(mint.toBase58());
+      expect(referralRecipientAcc.count.toNumber()).to.eq(0);
+      expect(referralRecipientAcc.claimed).to.eq(false);
+    });
+
+    it("allows to bid on nft with referral", async () => {
+      const bidReciept = bidderRecieptKey(listing, bidderKeypir.publicKey)[0];
+
+      const placeBidTxn = await auctionProgram.methods
+        .placeBidV0({
+          amount: toBigNumber(100000 * 8),
+          referralCode: "PERONI",
+        })
+        .accounts({
+          listing,
+          tokenMint,
+          auctionManager,
+          bidReciept,
+          payer: bidderKeypir.publicKey,
+          referralRecipient: referralRecipientKey(listing, mint)[0],
+        })
+        .transaction();
+
+      placeBidTxn.feePayer = bidderKeypir.publicKey;
+      placeBidTxn.recentBlockhash = (
+        await provider.connection.getLatestBlockhash()
+      ).blockhash;
+
+      const signedPlaceBidTxn = await bidderProvider.wallet.signTransaction(
+        placeBidTxn
+      );
+
+      await bidderProvider.sendAndConfirm(signedPlaceBidTxn);
+
+      const newBidRecieptAcc = await auctionProgram.account.bidRecieptV0.fetch(
+        bidReciept
+      );
+
+      const listingAcc = await auctionProgram.account.listingV0.fetch(listing);
+
+      const referralRecipientAcc =
+        await auctionProgram.account.referralRecipientV0.fetch(
+          referralRecipientKey(listing, mint)[0]
+        );
+
+      expect(listingAcc.totalReferralCount.toNumber()).to.eq(1);
+      expect(newBidRecieptAcc.bidder.toBase58()).to.eq(
+        bidderKeypir.publicKey.toBase58()
+      );
+      expect(newBidRecieptAcc.amount.toNumber()).to.eq(100000 * 8);
+      expect(newBidRecieptAcc.listing.toBase58()).to.eq(listing.toBase58());
+      expect(newBidRecieptAcc.referralRecipient?.toBase58()).to.eq(
+        referralRecipientKey(listing, mint)[0].toBase58()
+      );
+      expect(referralRecipientAcc.count.toNumber()).to.eq(1);
+    });
+
     it("allows to cancel bid", async () => {
-      const bidReciept = bidderRecieptKey(listing)[0];
+      const bidReciept = bidderRecieptKey(listing, bidderKeypir.publicKey)[0];
 
       const placeBidTxn = await auctionProgram.methods
         .placeBidV0({
@@ -334,7 +416,7 @@ describe("auction-manager", () => {
     });
 
     it("allows to execute sale", async () => {
-      const bidReciept = bidderRecieptKey(listing)[0];
+      const bidReciept = bidderRecieptKey(listing, bidderKeypir.publicKey)[0];
 
       const placeBidTxn = await auctionProgram.methods
         .placeBidV0({
@@ -395,73 +477,5 @@ describe("auction-manager", () => {
       expect(executedSaleAcct.state?.executed).to.exist;
       expect(executedSaleAcct.state?.active).to.not.exist;
     });
-
-    //   describe("with carrier approval", async () => {
-    //     beforeEach(async () => {
-    //       await memProgram.methods
-    //         .approveCarrierV0()
-    //         .accounts({ carrier })
-    //         .rpc({ skipPreflight: true });
-    //     });
-
-    //     it("allows the carrier to initialize subscribers", async () => {
-    //       const name = random();
-    //       await memProgram.methods
-    //         .initializeSubscriberV0({
-    //           entityKey: Buffer.from(name, "utf-8"),
-    //           metadataUrl: null,
-    //           name,
-    //         })
-    //         .preInstructions([
-    //           ComputeBudgetProgram.setComputeUnitLimit({ units: 500000 }),
-    //         ])
-    //         .accounts({ carrier, recipient: me })
-    //         .rpc({ skipPreflight: true });
-    //     });
-
-    //     it("can swap tree when it's full", async () => {
-    //       // fill up the tree
-    //       while (true) {
-    //         try {
-    //           const name = random();
-    //           await memProgram.methods
-    //             .initializeSubscriberV0({
-    //               entityKey: Buffer.from(name, "utf-8"),
-    //               metadataUrl: null,
-    //               name,
-    //             })
-    //             .preInstructions([
-    //               ComputeBudgetProgram.setComputeUnitLimit({ units: 500000 }),
-    //             ])
-    //             .accounts({ carrier, recipient: me })
-    //             .rpc({ skipPreflight: true });
-    //         } catch (err) {
-    //           console.error(err);
-    //           break;
-    //         }
-    //       }
-
-    //       const newMerkle = Keypair.generate();
-    //       const space = getConcurrentMerkleTreeAccountSize(3, 8);
-    //       const createMerkle = SystemProgram.createAccount({
-    //         fromPubkey: provider.wallet.publicKey,
-    //         newAccountPubkey: newMerkle.publicKey,
-    //         lamports: await provider.connection.getMinimumBalanceForRentExemption(
-    //           space
-    //         ),
-    //         space: space,
-    //         programId: SPL_ACCOUNT_COMPRESSION_PROGRAM_ID,
-    //       });
-    //       await memProgram.methods
-    //         .updateCarrierTreeV0({
-    //           maxDepth: 3,
-    //           maxBufferSize: 8,
-    //         })
-    //         .accounts({ carrier, newMerkleTree: newMerkle.publicKey })
-    //         .preInstructions([createMerkle])
-    //         .signers([newMerkle])
-    //         .rpc();
-    //     });
-    //   });
   });
 });

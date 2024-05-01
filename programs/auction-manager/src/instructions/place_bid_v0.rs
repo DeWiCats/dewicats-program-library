@@ -96,18 +96,16 @@ pub fn handler(ctx: Context<PlaceBidV0>, args: PlaceBidArgsV0) -> Result<()> {
     ctx.accounts.bid_reciept.state = BidRecieptState::Active;
 
     if let Some(ref referral_code) = args.referral_code {
-        // check if referral_recipient was provided
-        // if ctx.accounts.referral_recipient == None {
-        //     return Err(ErrorCode::ReferralRecipientNotFound.into());
-        // }
+        if ctx.accounts.referral_recipient.is_none() {
+            return Err(ErrorCode::ReferralRecipientNotFound.into());
+        }
 
-        if let referral_recipient = ctx.accounts.referral_recipient.clone().unwrap() {
+        if let Some(ref mut referral_recipient) = ctx.accounts.referral_recipient {
             if referral_code != &referral_recipient.referral_code {
                 return Err(ErrorCode::ReferralCodeMismatch.into());
             }
 
-            // increase count of referral_recipient
-            ctx.accounts.referral_recipient.clone().unwrap().count += 1;
+            referral_recipient.count += 1;
 
             ctx.accounts.bid_reciept.referral_recipient = Some(referral_recipient.key());
             ctx.accounts.listing.total_referral_count += 1;

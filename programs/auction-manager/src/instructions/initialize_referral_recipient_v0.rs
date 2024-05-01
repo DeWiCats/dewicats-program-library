@@ -1,4 +1,4 @@
-use crate::state::*;
+use crate::{ state::*, metaplex::MetadataAccount };
 use anchor_lang::prelude::*;
 use anchor_spl::token::Mint;
 
@@ -14,6 +14,17 @@ pub struct InitializeReferralRecipientV0<'info> {
     pub payer: Signer<'info>,
     pub system_program: Program<'info, System>,
     pub nft: Box<Account<'info, Mint>>,
+    pub auction_manager: Box<Account<'info, AuctionManagerV0>>,
+    #[account(
+        seeds = ["metadata".as_bytes(), MetadataAccount::owner().as_ref(), nft.key().as_ref()],
+        seeds::program = MetadataAccount::owner(),
+        bump,
+        constraint = metadata.collection
+            .as_ref()
+            .map(|col| col.verified && col.key == auction_manager.collection)
+            .unwrap_or_else(|| false)
+    )]
+    pub metadata: Box<Account<'info, MetadataAccount>>,
     pub listing: Box<Account<'info, ListingV0>>,
     #[account(
         init,

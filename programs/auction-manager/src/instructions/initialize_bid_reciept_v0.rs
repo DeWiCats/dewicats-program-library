@@ -16,7 +16,7 @@ pub struct InitializeBidRecieptV0<'info> {
         init,
         payer = payer,
         space = 8 + 60 + std::mem::size_of::<BidRecieptV0>(),
-        seeds = ["bid_reciept".as_bytes(), listing.key().as_ref()],
+        seeds = ["bid_reciept".as_bytes(), listing.key().as_ref(), payer.key().as_ref()],
         bump
     )]
     pub bid_reciept: Box<Account<'info, BidRecieptV0>>,
