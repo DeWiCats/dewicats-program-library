@@ -92,5 +92,17 @@ export const auctionManagerResolvers = combineResolvers(
     account: "tokenEscrow",
     mint: "tokenMint",
     owner: "auctionManager",
+  }),
+  ataResolver({
+    instruction: "claimReferralRewardsV0",
+    account: "tokenEscrow",
+    mint: "tokenMint",
+    owner: "auctionManager",
+  }),
+  ataResolver({
+    instruction: "claimReferralRewardsV0",
+    account: "tokenSource",
+    mint: "tokenMint",
+    owner: "payer",
   })
 );

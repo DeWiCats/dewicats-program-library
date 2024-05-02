@@ -16,7 +16,7 @@ pub struct ClaimReferralRewardsV0<'info> {
     pub auction_manager: Box<Account<'info, AuctionManagerV0>>,
     #[account(
         mut,
-        has_one = token_mint
+        has_one = token_mint,
       )]
     pub listing: Box<Account<'info, ListingV0>>,
     pub token_mint: Box<Account<'info, Mint>>,
@@ -81,6 +81,8 @@ pub fn handler(
         ((listing_sale * reward_percentage) / total_referral_count) * referral_count;
 
     token::transfer(ctx.accounts.transfer_escrow_ctx().with_signer(&[seeds]), reward_amount)?;
+
+    ctx.accounts.referral_recipient.claimed = true;
 
     Ok(())
 }

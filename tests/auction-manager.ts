@@ -477,5 +477,27 @@ describe("auction-manager", () => {
       expect(executedSaleAcct.state?.executed).to.exist;
       expect(executedSaleAcct.state?.active).to.not.exist;
     });
+
+    it("allows to claim rewards", async () => {
+      await auctionProgram.methods
+        .claimReferralRewardsV0({
+          recipientWallet: me,
+        })
+        .accounts({
+          auctionManager,
+          bidReciept: bidderRecieptKey(listing, bidderKeypir.publicKey)[0],
+          referralRecipient: referralRecipientKey(listing, mint)[0],
+          listing,
+          tokenMint,
+        })
+        .rpcAndKeys({ skipPreflight: true });
+
+      const referralRecipientAcc =
+        await auctionProgram.account.referralRecipientV0.fetch(
+          referralRecipientKey(listing, mint)[0]
+        );
+
+      expect(referralRecipientAcc.claimed).to.eq(true);
+    });
   });
 });
