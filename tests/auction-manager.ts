@@ -1,14 +1,12 @@
 import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
 import {
-  SystemProgram,
   Keypair,
   PublicKey,
   ComputeBudgetProgram,
   LAMPORTS_PER_SOL,
 } from "@solana/web3.js";
 import chai from "chai";
-import { IDL } from "../packages/idls/lib/cjs/auction_manager";
 import {
   bidderRecieptKey,
   init as initAuctionManager,
@@ -16,7 +14,6 @@ import {
 } from "../packages/auction-manager-sdk/src";
 const { expect } = chai;
 import chaiAsPromised from "chai-as-promised";
-import { getAccount } from "@solana/spl-token";
 import { random } from "./utils/string";
 import { AuctionManager } from "../target/types/auction_manager";
 import { ensureAuctionIdl } from "./utils/fixtures";
@@ -27,7 +24,6 @@ import {
   SplTokenAmount,
   SplTokenCurrency,
 } from "@metaplex-foundation/js";
-import { MOBILE_MINT } from "@helium/spl-utils";
 
 chai.use(chaiAsPromised);
 
@@ -73,18 +69,10 @@ describe("auction-manager", () => {
       })
     ).nft.address;
 
-    console.log("anchor.workspace.auctionManager", anchor.workspace);
-
-    const programId = new PublicKey(
-      "aucwFHspXAnpzCcgCDnepFisGixxxEhW4rkBVizjXcg"
-    );
-
     auctionProgram = await initAuctionManager(
       provider,
-      programId,
-      IDL as any
-      //   anchor.workspace.auctionManager.programId,
-      //   anchor.workspace.auctionManager.idl
+      anchor.workspace.auctionManager.programId,
+      anchor.workspace.auctionManager.idl
     );
     ensureAuctionIdl(auctionProgram);
   });
