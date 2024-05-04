@@ -33,11 +33,7 @@ let mint: PublicKey;
 let auctionManager: PublicKey;
 
 describe("auction-manager", () => {
-  anchor.setProvider(
-    anchor.AnchorProvider.local("http://127.0.0.1:8899", {
-      skipPreflight: true,
-    })
-  );
+  anchor.setProvider(anchor.AnchorProvider.env());
   const provider = anchor.getProvider() as anchor.AnchorProvider;
   const me = provider.wallet.publicKey;
   const metaplex = new Metaplex(provider.connection);

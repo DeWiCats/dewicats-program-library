@@ -4,7 +4,6 @@ skip-lint = false
 
 [programs.localnet]
 auction_manager = "Dkx9VEZRmodBvgdyFFNrb9P2g97fDSvkdZc6puMjrgbQ"
-stake_manager = "3pfjuMCxT9fRFjR5ZUwWM852N2rmzrFdgxkknvMHTyXs"
 
 [workspace]
 members = [
