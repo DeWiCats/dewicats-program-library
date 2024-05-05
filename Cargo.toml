@@ -6,6 +6,3 @@ members = [
 [workspace.dependencies]
 anchor-lang = { version = "0.28.0", features = ["init-if-needed"] }
 anchor-spl = { version = "0.28.0", features = ["mint", "token"] }
-mpl-token-metadata = { version = "3.2.0" }
-solana-security-txt = "1.1.1"
-default-env = "0.1.1"
