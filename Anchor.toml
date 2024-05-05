@@ -1,9 +1,10 @@
 [features]
 seeds = true
-skip-lint = false
+docs = false
 
 [programs.localnet]
-auction_manager = "Dkx9VEZRmodBvgdyFFNrb9P2g97fDSvkdZc6puMjrgbQ"
+auction_manager = "aucwFHspXAnpzCcgCDnepFisGixxxEhW4rkBVizjXcg"
+
 
 [workspace]
 members = [
@@ -20,13 +21,11 @@ wallet = "~/.config/solana/id.json"
 [scripts]
 test = "yarn run ts-mocha -p ./tsconfig.test.json -t 1000000 tests/**/*.ts"
 
-## Necessary for test validator
-[test.validator]
-url = "https://api.mainnet-beta.solana.com"
-
 [test]
 startup_wait = 20000
 
-## Cloning main programs
+[test.validator]
+url = "https://api.mainnet-beta.solana.com"
+
 [[test.validator.clone]]
 address = "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s" # token-metadata

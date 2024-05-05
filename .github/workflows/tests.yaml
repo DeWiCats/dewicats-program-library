@@ -3,11 +3,11 @@ name: Tests
 on:
   push:
     branches:
-      - main
-      - ci-tests
+      - master
   pull_request:
     branches:
-      - main
+      - master
+      - develop
 env:
   SOLANA_CLI_VERSION: 1.16.13
   NODE_VERSION: 18.12.1
@@ -77,6 +77,8 @@ jobs:
             echo "Waiting for local Anchor network to start..."
             sleep 5
           done
+      - name: Run bootstrap script
+        run: ./scripts/bootstrap.sh
 
   test-contracts:
     needs: build
@@ -86,7 +88,7 @@ jobs:
       fail-fast: false
       matrix:
         test:
-          - tests/auction-manager.ts
+          - tests/auction_manager.ts
     steps:
       - uses: actions/checkout@v3
       - uses: ./.github/actions/build-anchor/
@@ -105,4 +107,4 @@ jobs:
         env:
           TESTING: true
           TEST: ${{ matrix.test }}
-          ANCHOR_PROVIDER_URL: http://127.0.0.1:8899
+          ANCHOR_PROVIDER_URL: http://localhost:8899

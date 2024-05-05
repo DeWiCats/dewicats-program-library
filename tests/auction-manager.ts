@@ -13,10 +13,8 @@ import {
   referralRecipientKey,
 } from "../packages/auction-manager-sdk/src";
 const { expect } = chai;
-import chaiAsPromised from "chai-as-promised";
 import { random } from "./utils/string";
 import { AuctionManager } from "../target/types/auction_manager";
-import { ensureAuctionIdl } from "./utils/fixtures";
 import {
   Metaplex,
   toBigNumber,
@@ -25,15 +23,13 @@ import {
   SplTokenCurrency,
 } from "@metaplex-foundation/js";
 
-chai.use(chaiAsPromised);
-
 let auctionProgram: Program<AuctionManager>;
 let collection: PublicKey;
 let mint: PublicKey;
 let auctionManager: PublicKey;
 
 describe("auction-manager", () => {
-  anchor.setProvider(anchor.AnchorProvider.env());
+  anchor.setProvider(anchor.AnchorProvider.local("http://127.0.0.1:8899"));
   const provider = anchor.getProvider() as anchor.AnchorProvider;
   const me = provider.wallet.publicKey;
   const metaplex = new Metaplex(provider.connection);
@@ -67,10 +63,9 @@ describe("auction-manager", () => {
 
     auctionProgram = await initAuctionManager(
       provider,
-      anchor.workspace.auctionManager.programId,
-      anchor.workspace.auctionManager.idl
+      anchor.workspace.AuctionManager.programId,
+      anchor.workspace.AuctionManager.idl
     );
-    ensureAuctionIdl(auctionProgram);
   });
 
   it("should initialize a auction manager", async () => {
