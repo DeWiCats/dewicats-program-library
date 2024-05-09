@@ -36,7 +36,7 @@ pub struct InitializeReferralRecipientV0<'info> {
 
 pub fn handler(
   ctx: Context<InitializeReferralRecipientV0>,
-  args: InitializeReferralRecipientArgsV0,
+  _args: InitializeReferralRecipientArgsV0,
 ) -> Result<()> {
   ctx
     .accounts
