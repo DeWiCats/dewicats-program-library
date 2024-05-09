@@ -202,7 +202,6 @@ describe("auction-manager", () => {
       const placeBidTxn = await auctionProgram.methods
         .placeBidV0({
           amount: toBigNumber(100000 * 5),
-          referralCode: null,
         })
         .accounts({
           listing,
@@ -240,9 +239,7 @@ describe("auction-manager", () => {
       const {
         pubkeys: { referralRecipient },
       } = await auctionProgram.methods
-        .initializeReferralRecipientV0({
-          referralCode: "PERONI",
-        })
+        .initializeReferralRecipientV0({})
         .accounts({
           listing,
           auctionManager,
@@ -259,7 +256,6 @@ describe("auction-manager", () => {
           referralRecipient
         );
 
-      expect(referralRecipientAcc.referralCode).to.eq("PERONI");
       expect(referralRecipientAcc.nft.toBase58()).to.eq(mint.toBase58());
       expect(referralRecipientAcc.count.toNumber()).to.eq(0);
       expect(referralRecipientAcc.claimed).to.eq(false);
@@ -271,7 +267,6 @@ describe("auction-manager", () => {
       const placeBidTxn = await auctionProgram.methods
         .placeBidV0({
           amount: toBigNumber(100000 * 8),
-          referralCode: "PERONI",
         })
         .accounts({
           listing,
@@ -323,7 +318,6 @@ describe("auction-manager", () => {
       const placeBidTxn = await auctionProgram.methods
         .placeBidV0({
           amount: toBigNumber(100000 * 10),
-          referralCode: null,
         })
         .accounts({
           listing,
@@ -400,7 +394,6 @@ describe("auction-manager", () => {
       const placeBidTxn = await auctionProgram.methods
         .placeBidV0({
           amount: toBigNumber(100000 * 20),
-          referralCode: null,
         })
         .accounts({
           listing,
