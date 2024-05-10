@@ -1,25 +1,20 @@
 import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
 import {
-  SystemProgram,
   Keypair,
   PublicKey,
   ComputeBudgetProgram,
   LAMPORTS_PER_SOL,
 } from "@solana/web3.js";
 import chai from "chai";
-import { IDL } from "../packages/idls/lib/cjs/auction_manager";
 import {
   bidderRecieptKey,
   init as initAuctionManager,
   referralRecipientKey,
 } from "../packages/auction-manager-sdk/src";
 const { expect } = chai;
-import chaiAsPromised from "chai-as-promised";
-import { getAccount } from "@solana/spl-token";
 import { random } from "./utils/string";
 import { AuctionManager } from "../target/types/auction_manager";
-import { ensureAuctionIdl } from "./utils/fixtures";
 import {
   Metaplex,
   toBigNumber,
@@ -27,9 +22,6 @@ import {
   SplTokenAmount,
   SplTokenCurrency,
 } from "@metaplex-foundation/js";
-import { MOBILE_MINT } from "@helium/spl-utils";
-
-chai.use(chaiAsPromised);
 
 let auctionProgram: Program<AuctionManager>;
 let collection: PublicKey;
@@ -37,11 +29,7 @@ let mint: PublicKey;
 let auctionManager: PublicKey;
 
 describe("auction-manager", () => {
-  anchor.setProvider(
-    anchor.AnchorProvider.local("http://127.0.0.1:8899", {
-      skipPreflight: true,
-    })
-  );
+  anchor.setProvider(anchor.AnchorProvider.local("http://127.0.0.1:8899"));
   const provider = anchor.getProvider() as anchor.AnchorProvider;
   const me = provider.wallet.publicKey;
   const metaplex = new Metaplex(provider.connection);
@@ -73,20 +61,11 @@ describe("auction-manager", () => {
       })
     ).nft.address;
 
-    console.log("anchor.workspace.auctionManager", anchor.workspace);
-
-    const programId = new PublicKey(
-      "aucwFHspXAnpzCcgCDnepFisGixxxEhW4rkBVizjXcg"
-    );
-
     auctionProgram = await initAuctionManager(
       provider,
-      programId,
-      IDL as any
-      //   anchor.workspace.auctionManager.programId,
-      //   anchor.workspace.auctionManager.idl
+      anchor.workspace.AuctionManager.programId,
+      anchor.workspace.AuctionManager.idl
     );
-    ensureAuctionIdl(auctionProgram);
   });
 
   it("should initialize a auction manager", async () => {
@@ -223,7 +202,6 @@ describe("auction-manager", () => {
       const placeBidTxn = await auctionProgram.methods
         .placeBidV0({
           amount: toBigNumber(100000 * 5),
-          referralCode: null,
         })
         .accounts({
           listing,
@@ -261,9 +239,7 @@ describe("auction-manager", () => {
       const {
         pubkeys: { referralRecipient },
       } = await auctionProgram.methods
-        .initializeReferralRecipientV0({
-          referralCode: "PERONI",
-        })
+        .initializeReferralRecipientV0({})
         .accounts({
           listing,
           auctionManager,
@@ -280,7 +256,6 @@ describe("auction-manager", () => {
           referralRecipient
         );
 
-      expect(referralRecipientAcc.referralCode).to.eq("PERONI");
       expect(referralRecipientAcc.nft.toBase58()).to.eq(mint.toBase58());
       expect(referralRecipientAcc.count.toNumber()).to.eq(0);
       expect(referralRecipientAcc.claimed).to.eq(false);
@@ -292,7 +267,6 @@ describe("auction-manager", () => {
       const placeBidTxn = await auctionProgram.methods
         .placeBidV0({
           amount: toBigNumber(100000 * 8),
-          referralCode: "PERONI",
         })
         .accounts({
           listing,
@@ -344,7 +318,6 @@ describe("auction-manager", () => {
       const placeBidTxn = await auctionProgram.methods
         .placeBidV0({
           amount: toBigNumber(100000 * 10),
-          referralCode: null,
         })
         .accounts({
           listing,
@@ -421,7 +394,6 @@ describe("auction-manager", () => {
       const placeBidTxn = await auctionProgram.methods
         .placeBidV0({
           amount: toBigNumber(100000 * 20),
-          referralCode: null,
         })
         .accounts({
           listing,
@@ -476,6 +448,28 @@ describe("auction-manager", () => {
 
       expect(executedSaleAcct.state?.executed).to.exist;
       expect(executedSaleAcct.state?.active).to.not.exist;
+    });
+
+    it("allows to claim rewards", async () => {
+      await auctionProgram.methods
+        .claimReferralRewardsV0({
+          recipientWallet: me,
+        })
+        .accounts({
+          auctionManager,
+          bidReciept: bidderRecieptKey(listing, bidderKeypir.publicKey)[0],
+          referralRecipient: referralRecipientKey(listing, mint)[0],
+          listing,
+          tokenMint,
+        })
+        .rpcAndKeys({ skipPreflight: true });
+
+      const referralRecipientAcc =
+        await auctionProgram.account.referralRecipientV0.fetch(
+          referralRecipientKey(listing, mint)[0]
+        );
+
+      expect(referralRecipientAcc.claimed).to.eq(true);
     });
   });
 });
