@@ -29,3 +29,17 @@ export const referralRecipientKey = (
     programId
   );
 };
+
+export const auctionManagerKey = (
+  collection: PublicKey,
+  name: string,
+  programId: PublicKey = PROGRAM_ID
+) =>
+  PublicKey.findProgramAddressSync(
+    [
+      Buffer.from("auction_manager", "utf-8"),
+      collection.toBuffer(),
+      Buffer.from(name, "utf-8"),
+    ],
+    programId
+  );
