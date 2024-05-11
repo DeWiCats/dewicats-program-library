@@ -1,6 +1,13 @@
 import { PublicKey } from "@solana/web3.js";
 import { PROGRAM_ID } from "./constants";
 
+/**
+ *
+ * @param listing
+ * @param bidder
+ * @param programId
+ * @returns
+ */
 export const bidderRecieptKey = (
   listing: PublicKey,
   bidder: PublicKey,
@@ -15,6 +22,13 @@ export const bidderRecieptKey = (
     programId
   );
 
+/**
+ *
+ * @param listing
+ * @param nft
+ * @param programId
+ * @returns
+ */
 export const referralRecipientKey = (
   listing: PublicKey,
   nft: PublicKey,
@@ -30,6 +44,13 @@ export const referralRecipientKey = (
   );
 };
 
+/**
+ *
+ * @param collection
+ * @param name
+ * @param programId
+ * @returns
+ */
 export const auctionManagerKey = (
   collection: PublicKey,
   name: string,
