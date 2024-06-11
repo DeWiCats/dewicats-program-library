@@ -17,7 +17,7 @@
   "files": [
     "lib"
   ],
-  "gitHead": "5a8bf0b7b88e5934ef8d774e686f7c95804fbb8d",
+  "gitHead": "41b5fb55bdf012b6f05fd3119d29dbd92cac7a62",
   "license": "Apache-2.0",
   "name": "@dewicats/idls",
   "publishConfig": {
@@ -36,5 +36,5 @@
     "precommit": "npx git-format-staged -f 'prettier --ignore-unknown --stdin --stdin-filepath \"{}\"' ."
   },
   "sideEffects": false,
-  "version": "0.0.4"
+  "version": "0.0.5"
 }
