@@ -19,7 +19,10 @@ pub struct PlaceBidV0<'info> {
   pub auction_manager: Box<Account<'info, AuctionManagerV0>>,
   #[account(
         mut,
-        has_one = token_mint
+        has_one = token_mint,
+        constraint = listing.auction_manager == *auction_manager.to_account_info().key,
+        constraint = listing.token_mint == *token_mint.to_account_info().key,
+        constraint = listing.state == ListingState::Active
       )]
   pub listing: Box<Account<'info, ListingV0>>,
   pub token_mint: Box<Account<'info, Mint>>,
@@ -92,12 +95,27 @@ pub fn handler(ctx: Context<PlaceBidV0>, args: PlaceBidArgsV0) -> Result<()> {
   ctx.accounts.listing.bid_amount = args.amount;
   ctx.accounts.listing.highest_bid_reciept = ctx.accounts.bid_reciept.key();
   ctx.accounts.bid_reciept.state = BidRecieptState::Active;
+  ctx.accounts.bid_reciept.created_at = Clock::get()?.unix_timestamp;
+
+  // If bid is within 5 minutes of listing end, extend listing duration to a maximum of 5 minutes
+  if ctx.accounts.listing.created_at + ctx.accounts.listing.duration - Clock::get()?.unix_timestamp
+    < 300
+  {
+    let current_time = Clock::get()?.unix_timestamp;
+    let listing_end_time = ctx.accounts.listing.created_at + ctx.accounts.listing.duration;
+    let time_left = listing_end_time - current_time;
+    let time_to_extend = 300 - time_left;
+    ctx.accounts.listing.duration += time_to_extend;
+  }
 
   if let Some(ref mut referral_recipient) = ctx.accounts.referral_recipient {
-    referral_recipient.count += 1;
+    // if ctx.accounts.bid_reciept.referral_recipient exists already then dont increase total_referral_count
+    if ctx.accounts.bid_reciept.referral_recipient.is_none() {
+      referral_recipient.count += 1;
+      ctx.accounts.listing.total_referral_count += 1;
+    }
 
     ctx.accounts.bid_reciept.referral_recipient = Some(referral_recipient.key());
-    ctx.accounts.listing.total_referral_count += 1;
   }
 
   Ok(())

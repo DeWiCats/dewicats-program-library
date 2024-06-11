@@ -2,9 +2,7 @@ use crate::state::*;
 use anchor_lang::prelude::*;
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Default)]
-pub struct InitializeBidRecieptArgsV0 {
-  amount: u64,
-}
+pub struct InitializeBidRecieptArgsV0 {}
 
 #[derive(Accounts)]
 pub struct InitializeBidRecieptV0<'info> {
@@ -24,15 +22,16 @@ pub struct InitializeBidRecieptV0<'info> {
 
 pub fn handler(
   ctx: Context<InitializeBidRecieptV0>,
-  args: InitializeBidRecieptArgsV0,
+  _args: InitializeBidRecieptArgsV0,
 ) -> Result<()> {
   ctx.accounts.bid_reciept.set_inner(BidRecieptV0 {
     listing: ctx.accounts.listing.key(),
     bidder: ctx.accounts.payer.key(),
-    amount: args.amount,
+    amount: 0,
     created_at: Clock::get()?.unix_timestamp,
     state: BidRecieptState::Pending,
     referral_recipient: None,
+    bump_seed: ctx.bumps["bid_reciept"],
   });
 
   Ok(())

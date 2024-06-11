@@ -45,6 +45,7 @@ pub fn handler(
       nft: ctx.accounts.nft.key(),
       count: 0,
       claimed: false,
+      bump_seed: ctx.bumps["referral_recipient"],
     });
 
   Ok(())
