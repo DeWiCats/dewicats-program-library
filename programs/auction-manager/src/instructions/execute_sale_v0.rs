@@ -174,7 +174,7 @@ pub fn handler(ctx: Context<ExecuteSaleV0>, _args: ExecuteSaleArgsV0) -> Result<
     Some(&[seeds]),
   )?;
 
-  let reward_percentage = ctx.accounts.auction_manager.reward_percentage;
+  let reward_percentage = ctx.accounts.listing.reward_percentage;
 
   let reward_amount = ctx.accounts.highest_bid_reciept.amount / reward_percentage;
 

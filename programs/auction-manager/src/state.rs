@@ -7,7 +7,6 @@ pub struct AuctionManagerV0 {
   pub name: String,
   pub update_authority: Pubkey,
   pub listing_authority: Pubkey,
-  pub reward_percentage: u64,
   pub bump_seed: u8,
 }
 
@@ -55,6 +54,7 @@ pub struct ListingV0 {
   pub total_referral_count: u64,
   pub state: ListingState,
   pub auction_proceeds_wallet: Pubkey,
+  pub reward_percentage: u64,
   pub bump_seed: u8,
 }
 

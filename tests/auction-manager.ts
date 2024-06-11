@@ -99,7 +99,6 @@ describe("auction-manager", () => {
         collection,
         listingAuthority: me,
         updateAuthority: me,
-        rewardPercentage: toBigNumber(30),
       })
       .preInstructions([
         ComputeBudgetProgram.setComputeUnitLimit({ units: 500000 }),
@@ -117,7 +116,6 @@ describe("auction-manager", () => {
     expect(auctionManagerAcc.listingAuthority.toBase58()).to.eq(me.toBase58());
     expect(auctionManagerAcc.updateAuthority.toBase58()).to.eq(me.toBase58());
     expect(auctionManagerAcc.name).to.eq(name);
-    expect(auctionManagerAcc.rewardPercentage.toNumber()).to.eq(30);
   });
 
   describe("with a auction manager", async () => {
@@ -170,6 +168,7 @@ describe("auction-manager", () => {
           duration: toBigNumber(1000),
           startingPrice: toBigNumber(100),
           auctionProceedsWallet: me,
+          rewardPercentage: toBigNumber(30),
         })
         .accounts({
           nft: mint,
@@ -192,6 +191,8 @@ describe("auction-manager", () => {
       expect(listingAcc.duration.toNumber()).to.eq(1000);
       expect(listingAcc.nft.toBase58()).to.eq(mint.toBase58());
       expect(listingAcc.tokenMint.toBase58()).to.eq(tokenMint.toBase58());
+      expect(listingAcc.auctionProceedsWallet.toBase58()).to.eq(me.toBase58());
+      expect(listingAcc.rewardPercentage.toNumber()).to.eq(30);
     });
 
     it("allows to bid on an nft", async () => {
@@ -535,7 +536,6 @@ describe("auction-manager", () => {
         .updateAuctionManagerV0({
           listingAuthority: newListingAuthority,
           updateAuthority: newUpdateAuthority,
-          rewardPercentage: newRewardPercentage,
         })
         .accounts({
           auctionManager,
@@ -551,7 +551,6 @@ describe("auction-manager", () => {
       expect(auctionManagerAcc.updateAuthority.toBase58()).to.eq(
         newUpdateAuthority.toBase58()
       );
-      expect(auctionManagerAcc.rewardPercentage.toNumber()).to.eq(50);
     });
   });
 });

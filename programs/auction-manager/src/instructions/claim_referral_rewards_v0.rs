@@ -109,17 +109,12 @@ pub fn handler(
 
   let referral_count = ctx.accounts.referral_recipient.count;
   let total_referral_count = ctx.accounts.listing.total_referral_count;
-  // This cannot be a decima
-  let reward_percentage = ctx.accounts.auction_manager.reward_percentage;
+  // This cannot be a decimal
+  let reward_percentage = ctx.accounts.listing.reward_percentage;
   let listing_sale = ctx.accounts.listing.bid_amount;
 
   // Calculate the reward amount based on the referral count and reward percentage and listing sale. Reward amount = ((listing sale * reward percentage) / total referral count ) * referral count
   let reward_amount = (listing_sale / reward_percentage / total_referral_count) * referral_count;
-  msg!("Reward amount: {}", reward_amount);
-  msg!("Listing sale: {}", listing_sale);
-  msg!("Reward percentage: {}", reward_percentage);
-  msg!("Total referral count: {}", total_referral_count);
-  msg!("Referral count: {}", referral_count);
 
   token::transfer(
     ctx.accounts.transfer_escrow_ctx().with_signer(&[seeds]),

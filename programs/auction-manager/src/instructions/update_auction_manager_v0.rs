@@ -5,7 +5,6 @@ use anchor_lang::prelude::*;
 pub struct UpdateAuctionManagerArgsV0 {
   pub update_authority: Pubkey,
   pub listing_authority: Pubkey,
-  pub reward_percentage: u64,
 }
 
 #[derive(Accounts)]
@@ -27,7 +26,6 @@ pub fn handler(
 ) -> Result<()> {
   ctx.accounts.auction_manager.update_authority = args.update_authority;
   ctx.accounts.auction_manager.listing_authority = args.listing_authority;
-  ctx.accounts.auction_manager.reward_percentage = args.reward_percentage;
 
   Ok(())
 }

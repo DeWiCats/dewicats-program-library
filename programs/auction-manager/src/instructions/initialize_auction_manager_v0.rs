@@ -8,7 +8,6 @@ pub struct InitializeAuctionManagerArgsV0 {
   pub collection: Pubkey,
   pub update_authority: Pubkey,
   pub listing_authority: Pubkey,
-  pub reward_percentage: u64,
 }
 
 #[derive(Accounts)]
@@ -37,7 +36,6 @@ pub fn handler(
     name: args.name,
     update_authority: args.update_authority,
     listing_authority: args.listing_authority,
-    reward_percentage: args.reward_percentage,
     bump_seed: ctx.bumps["auction_manager"],
   });
 

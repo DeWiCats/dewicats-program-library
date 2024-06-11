@@ -12,6 +12,7 @@ pub struct ListNftArgsV0 {
   pub starting_price: u64,
   pub duration: i64,
   pub auction_proceeds_wallet: Pubkey,
+  pub reward_percentage: u64,
 }
 
 #[derive(Accounts)]
@@ -152,6 +153,7 @@ pub fn handler(ctx: Context<ListNftV0>, args: ListNftArgsV0) -> Result<()> {
     total_referral_count: 0,
     state: ListingState::Active,
     auction_proceeds_wallet: args.auction_proceeds_wallet,
+    reward_percentage: args.reward_percentage,
     bump_seed: ctx.bumps["listing"],
   });
 
