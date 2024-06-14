@@ -5,7 +5,7 @@
     "bn.js": "^5.2.0",
     "bs58": "^4.0.1"
   },
-  "description": "Interface to the auction-manager smart contract",
+  "description": "Auction Manager SDK for Dewicats Program Library",
   "devDependencies": {
     "@types/crypto-js": "^4.1.1",
     "git-format-staged": "^2.1.3",
