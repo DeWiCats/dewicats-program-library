@@ -46,7 +46,7 @@ pub struct ListingV0 {
   pub nft: Pubkey,
   pub token_mint: Pubkey,
   pub starting_price: u64,
-  pub duration: i64,
+  pub end_at: i64,
   pub created_at: i64,
   pub highest_bid_reciept: Pubkey,
   pub bid_amount: u64,
@@ -55,6 +55,7 @@ pub struct ListingV0 {
   pub state: ListingState,
   pub auction_proceeds_wallet: Pubkey,
   pub reward_percentage: u64,
+  pub time_extension: u64,
   pub bump_seed: u8,
 }
 

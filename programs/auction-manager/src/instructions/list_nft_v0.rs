@@ -10,9 +10,10 @@ use mpl_token_metadata::instruction::TransferArgs;
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Default)]
 pub struct ListNftArgsV0 {
   pub starting_price: u64,
-  pub duration: i64,
+  pub end_at: i64,
   pub auction_proceeds_wallet: Pubkey,
   pub reward_percentage: u64,
+  pub time_extension: u64,
 }
 
 #[derive(Accounts)]
@@ -144,7 +145,7 @@ pub fn handler(ctx: Context<ListNftV0>, args: ListNftArgsV0) -> Result<()> {
     nft: ctx.accounts.nft.key(),
     token_mint: ctx.accounts.token_mint.key(),
     starting_price: args.starting_price,
-    duration: args.duration,
+    end_at: args.end_at,
     auction_manager: ctx.accounts.auction_manager.key(),
     created_at: Clock::get()?.unix_timestamp,
     highest_bid_reciept: ctx.accounts.auction_manager.key(),
@@ -154,6 +155,7 @@ pub fn handler(ctx: Context<ListNftV0>, args: ListNftArgsV0) -> Result<()> {
     state: ListingState::Active,
     auction_proceeds_wallet: args.auction_proceeds_wallet,
     reward_percentage: args.reward_percentage,
+    time_extension: args.time_extension,
     bump_seed: ctx.bumps["listing"],
   });
 

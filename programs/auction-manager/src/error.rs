@@ -16,4 +16,7 @@ pub enum ErrorCode {
 
   #[msg("Listing is not sold")]
   ListingNotSold,
+
+  #[msg("Listing still active")]
+  ListingStillActive,
 }

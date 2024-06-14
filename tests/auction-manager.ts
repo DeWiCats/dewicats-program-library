@@ -161,14 +161,19 @@ describe("auction-manager", () => {
     });
 
     it("allows to list an nft", async () => {
+      // timestamp 10 seconds from now
+      const end_timestamp = Math.floor(
+        (new Date().getTime() + 3 * 1000) / 1000
+      );
       const {
         pubkeys: { listing: l },
       } = await auctionProgram.methods
         .listNftV0({
-          duration: toBigNumber(1000),
+          endAt: new anchor.BN(end_timestamp),
           startingPrice: toBigNumber(100),
           auctionProceedsWallet: me,
           rewardPercentage: toBigNumber(30),
+          timeExtension: toBigNumber(0),
         })
         .accounts({
           nft: mint,
@@ -184,11 +189,13 @@ describe("auction-manager", () => {
 
       listing = l!;
 
+      console.log("listing", listing.toBase58());
+
       let listingAcc = await auctionProgram.account.listingV0.fetch(listing);
 
       expect(listingAcc.bidAmount.toNumber()).to.eq(0);
       expect(listingAcc.startingPrice.toNumber()).to.eq(100);
-      expect(listingAcc.duration.toNumber()).to.eq(1000);
+      expect(listingAcc.endAt.toNumber()).to.eq(end_timestamp);
       expect(listingAcc.nft.toBase58()).to.eq(mint.toBase58());
       expect(listingAcc.tokenMint.toBase58()).to.eq(tokenMint.toBase58());
       expect(listingAcc.auctionProceedsWallet.toBase58()).to.eq(me.toBase58());
@@ -450,10 +457,11 @@ describe("auction-manager", () => {
       expect(newBidRecieptAcc.amount.toNumber()).to.eq(100000 * 20);
       expect(newBidRecieptAcc.listing.toBase58()).to.eq(listing.toBase58());
 
+      // wait 2 seconds for auction to end
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
       await auctionProgram.methods
-        .executeSaleV0({
-          claimedRewards: false,
-        })
+        .executeSaleV0({})
         .accounts({
           auctionManager,
           auctionProceedsWallet: me,
@@ -530,7 +538,6 @@ describe("auction-manager", () => {
     it("allows to update auction manager", async () => {
       const newUpdateAuthority = Keypair.generate().publicKey;
       const newListingAuthority = Keypair.generate().publicKey;
-      const newRewardPercentage = toBigNumber(50);
 
       await auctionProgram.methods
         .updateAuctionManagerV0({
@@ -552,5 +559,80 @@ describe("auction-manager", () => {
         newUpdateAuthority.toBase58()
       );
     });
+    // it("allows to execute sale", async () => {
+    //   const mint2 = (
+    //     await metaplex.nfts().create({
+    //       uri: "https://example.com",
+    //       name: "test",
+    //       symbol: "test",
+    //       sellerFeeBasisPoints: 0,
+    //       collection,
+    //       collectionAuthority,
+    //       tokenStandard: TokenStandard.ProgrammableNonFungible,
+    //       ruleSet: new PublicKey("eBJLFYPxJmMGKuFwpDWkzxZeUrad92kZRC5BJLpzyT9"),
+    //     })
+    //   ).nft.address;
+
+    //   const {
+    //     pubkeys: { listing: l },
+    //   } = await auctionProgram.methods
+    //     .listNftV0({
+    //       duration: toBigNumber(60 * 60 * 24),
+    //       startingPrice: toBigNumber(100),
+    //       auctionProceedsWallet: me,
+    //       rewardPercentage: toBigNumber(30),
+    //     })
+    //     .accounts({
+    //       nft: mint2,
+    //       tokenMint,
+    //       auctionManager: auctionManager!,
+    //     })
+    //     .preInstructions([
+    //       ComputeBudgetProgram.setComputeUnitLimit({ units: 1_000_000 }),
+    //     ])
+    //     .rpcAndKeys({
+    //       skipPreflight: true,
+    //     });
+
+    //   const bidReciept = bidderRecieptKey(listing, provider.publicKey)[0];
+
+    //   await auctionProgram.methods
+    //     .placeBidV0({
+    //       amount: toBigNumber(100000 * 20),
+    //     })
+    //     .accounts({
+    //       listing: l,
+    //       tokenMint,
+    //       auctionManager,
+    //       bidReciept,
+    //       payer: provider.publicKey,
+    //       referralRecipient: null,
+    //     })
+    //     .rpc({ skipPreflight: true });
+
+    //   await auctionProgram.methods
+    //     .executeSaleV0({})
+    //     .accounts({
+    //       auctionManager,
+    //       auctionProceedsWallet: me,
+    //       listing: l,
+    //       bidder: provider.publicKey,
+    //       nft: mint2,
+    //       tokenMint,
+    //       highestBidReciept: bidReciept,
+    //       collection,
+    //     })
+    //     .preInstructions([
+    //       ComputeBudgetProgram.setComputeUnitLimit({ units: 1_000_000 }),
+    //     ])
+    //     .rpcAndKeys({ skipPreflight: true });
+
+    //   const executedSaleAcct = await auctionProgram.account.bidRecieptV0.fetch(
+    //     bidReciept
+    //   );
+
+    //   expect(executedSaleAcct.state?.executed).to.exist;
+    //   expect(executedSaleAcct.state?.active).to.not.exist;
+    // });
   });
 });

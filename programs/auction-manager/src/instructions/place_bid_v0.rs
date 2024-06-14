@@ -75,9 +75,8 @@ pub fn handler(ctx: Context<PlaceBidV0>, args: PlaceBidArgsV0) -> Result<()> {
     return Err(ErrorCode::BidAmountTooLow.into());
   }
 
-  // check that listing duration i64 and created_at timestamp is greater than current time
-  if ctx.accounts.listing.created_at + ctx.accounts.listing.duration < Clock::get()?.unix_timestamp
-  {
+  // check that listing end_at i64 and created_at timestamp is greater than current time
+  if ctx.accounts.listing.end_at < Clock::get()?.unix_timestamp {
     return Err(ErrorCode::ListingExpired.into());
   }
 
@@ -97,15 +96,12 @@ pub fn handler(ctx: Context<PlaceBidV0>, args: PlaceBidArgsV0) -> Result<()> {
   ctx.accounts.bid_reciept.state = BidRecieptState::Active;
   ctx.accounts.bid_reciept.created_at = Clock::get()?.unix_timestamp;
 
-  // If bid is within 5 minutes of listing end, extend listing duration to a maximum of 5 minutes
-  if ctx.accounts.listing.created_at + ctx.accounts.listing.duration - Clock::get()?.unix_timestamp
-    < 300
-  {
-    let current_time = Clock::get()?.unix_timestamp;
-    let listing_end_time = ctx.accounts.listing.created_at + ctx.accounts.listing.duration;
-    let time_left = listing_end_time - current_time;
-    let time_to_extend = 300 - time_left;
-    ctx.accounts.listing.duration += time_to_extend;
+  // If bid is within 5 minutes of listing end, extend listing end_at to a maximum of 5 minutes
+  let end_timestamp = ctx.accounts.listing.end_at;
+  let current_timestamp = Clock::get()?.unix_timestamp;
+  let time_extension = ctx.accounts.listing.time_extension as i64;
+  if end_timestamp - current_timestamp < time_extension && end_timestamp - current_timestamp > 0 {
+    ctx.accounts.listing.end_at += time_extension;
   }
 
   if let Some(ref mut referral_recipient) = ctx.accounts.referral_recipient {

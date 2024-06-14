@@ -1,7 +1,8 @@
 use crate::{
-  auction_manager_seeds, metaplex::MetadataAccount, state::*,
+  auction_manager_seeds, error::ErrorCode, metaplex::MetadataAccount, state::*,
   transfer_pnft::transfer_pnft_with_signer,
 };
+
 use anchor_lang::prelude::*;
 use anchor_spl::token::Mint;
 use anchor_spl::token::Transfer;
@@ -140,12 +141,25 @@ impl<'info> ExecuteSaleV0<'info> {
 
 #[allow(deprecated)]
 pub fn handler(ctx: Context<ExecuteSaleV0>, _args: ExecuteSaleArgsV0) -> Result<()> {
+  // Verify that the listing has ended
+  let end_at = ctx.accounts.listing.end_at;
+  let created_at = ctx.accounts.listing.created_at;
+  msg!(
+    "reward percentage: {}",
+    ctx.accounts.listing.reward_percentage
+  );
+  msg!("end_at: {}", end_at);
+  msg!("created_at: {}", created_at);
+  msg!("unix_timestamp: {}", Clock::get()?.unix_timestamp);
+
+  if end_at >= Clock::get()?.unix_timestamp {
+    return Err(ErrorCode::ListingStillActive.into());
+  }
+
   let seeds = auction_manager_seeds!(ctx.accounts.auction_manager);
 
   ctx.accounts.listing.state = ListingState::Sold;
 
-  // transfer nft to recipient
-  // token::transfer(ctx.accounts.transfer_escrow_ctx().with_signer(&[seeds]), 1)?;
   let transfer_args = TransferArgs::V1 {
     amount: 1,
     authorization_data: None,
