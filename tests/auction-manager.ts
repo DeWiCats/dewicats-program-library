@@ -71,7 +71,7 @@ describe("auction-manager", () => {
     secondMint = (
       await metaplex.nfts().create({
         uri: "https://example.com",
-        name: "test",
+        name: "test 2",
         symbol: "test",
         sellerFeeBasisPoints: 0,
         collection,
@@ -193,7 +193,7 @@ describe("auction-manager", () => {
 
       let listingAcc = await auctionProgram.account.listingV0.fetch(listing);
 
-      expect(listingAcc.bidAmount.toNumber()).to.eq(0);
+      expect(listingAcc.bidAmount.toNumber()).to.eq(100);
       expect(listingAcc.startingPrice.toNumber()).to.eq(100);
       expect(listingAcc.endAt.toNumber()).to.eq(end_timestamp);
       expect(listingAcc.nft.toBase58()).to.eq(mint.toBase58());
@@ -270,11 +270,14 @@ describe("auction-manager", () => {
       const {
         pubkeys: { referralRecipient },
       } = await auctionProgram.methods
-        .initializeReferralRecipientV0({})
+        .initializeReferralRecipientV0({
+          nftName: "test 2",
+        })
         .accounts({
           listing,
           auctionManager,
           nft: secondMint,
+          referralRecipient: referralRecipientKey(listing, "test 2")[0],
         })
         .rpcAndKeys({ skipPreflight: true });
 
@@ -305,7 +308,7 @@ describe("auction-manager", () => {
           auctionManager,
           bidReciept,
           payer: bidderKeypir.publicKey,
-          referralRecipient: referralRecipientKey(listing, secondMint)[0],
+          referralRecipient: referralRecipientKey(listing, "test 2")[0],
         })
         .transaction();
 
@@ -328,7 +331,7 @@ describe("auction-manager", () => {
 
       const referralRecipientAcc =
         await auctionProgram.account.referralRecipientV0.fetch(
-          referralRecipientKey(listing, secondMint)[0]
+          referralRecipientKey(listing, "test 2")[0]
         );
 
       expect(listingAcc.totalReferralCount.toNumber()).to.eq(1);
@@ -338,7 +341,7 @@ describe("auction-manager", () => {
       expect(newBidRecieptAcc.amount.toNumber()).to.eq(100000 * 8);
       expect(newBidRecieptAcc.listing.toBase58()).to.eq(listing.toBase58());
       expect(newBidRecieptAcc.referralRecipient?.toBase58()).to.eq(
-        referralRecipientKey(listing, secondMint)[0].toBase58()
+        referralRecipientKey(listing, "test 2")[0].toBase58()
       );
       expect(referralRecipientAcc.count.toNumber()).to.eq(1);
     });
@@ -507,7 +510,7 @@ describe("auction-manager", () => {
         .accounts({
           auctionManager,
           bidReciept: bidderRecieptKey(listing, bidderKeypir.publicKey)[0],
-          referralRecipient: referralRecipientKey(listing, secondMint)[0],
+          referralRecipient: referralRecipientKey(listing, "test 2")[0],
           listing,
           tokenMint,
           nft: secondMint,
@@ -516,7 +519,7 @@ describe("auction-manager", () => {
 
       const referralRecipientAcc =
         await auctionProgram.account.referralRecipientV0.fetch(
-          referralRecipientKey(listing, secondMint)[0]
+          referralRecipientKey(listing, "test 2")[0]
         );
 
       tokenAccounts = await provider.connection.getTokenAccountsByOwner(me, {

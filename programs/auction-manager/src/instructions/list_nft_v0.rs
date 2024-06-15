@@ -32,6 +32,18 @@ pub struct ListNftV0<'info> {
   #[account(
         init,
         payer = listing_authority,
+        space = 8 + 60 + std::mem::size_of::<BidRecieptV0>(),
+        seeds = [
+            "bid_reciept".as_bytes(),
+            listing.key().as_ref(),
+            listing_authority.key().as_ref(),
+        ],
+        bump
+    )]
+  pub initial_bid_reciept: Box<Account<'info, BidRecieptV0>>,
+  #[account(
+        init,
+        payer = listing_authority,
         space = 8 + 60 + std::mem::size_of::<ListingV0>(),
         seeds = ["listing".as_bytes(), nft.key().as_ref(), auction_manager.key().as_ref()],
         bump
@@ -141,6 +153,16 @@ pub fn handler(ctx: Context<ListNftV0>, args: ListNftArgsV0) -> Result<()> {
     None,
   )?;
 
+  ctx.accounts.initial_bid_reciept.set_inner(BidRecieptV0 {
+    listing: ctx.accounts.listing.key(),
+    bidder: ctx.accounts.listing_authority.key(),
+    amount: args.starting_price,
+    created_at: Clock::get()?.unix_timestamp,
+    state: BidRecieptState::Pending,
+    referral_recipient: None,
+    bump_seed: ctx.bumps["initial_bid_reciept"],
+  });
+
   ctx.accounts.listing.set_inner(ListingV0 {
     nft: ctx.accounts.nft.key(),
     token_mint: ctx.accounts.token_mint.key(),
@@ -148,8 +170,8 @@ pub fn handler(ctx: Context<ListNftV0>, args: ListNftArgsV0) -> Result<()> {
     end_at: args.end_at,
     auction_manager: ctx.accounts.auction_manager.key(),
     created_at: Clock::get()?.unix_timestamp,
-    highest_bid_reciept: ctx.accounts.auction_manager.key(),
-    bid_amount: 0,
+    highest_bid_reciept: ctx.accounts.listing_authority.key(),
+    bid_amount: args.starting_price,
     nft_escrow: ctx.accounts.nft_escrow.key(),
     total_referral_count: 0,
     state: ListingState::Active,
