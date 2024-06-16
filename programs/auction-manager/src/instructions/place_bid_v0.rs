@@ -108,6 +108,10 @@ pub fn handler(ctx: Context<PlaceBidV0>, args: PlaceBidArgsV0) -> Result<()> {
   }
 
   if let Some(ref mut referral_recipient) = ctx.accounts.referral_recipient {
+    // Check that the referral_recipient listing is the same as the current listing
+    if referral_recipient.listing != ctx.accounts.listing.key() {
+      return Err(ErrorCode::ReferralRecipientListingMismatch.into());
+    }
     // if ctx.accounts.bid_reciept.referral_recipient exists already then dont increase total_referral_count
     if ctx.accounts.bid_reciept.referral_recipient.is_none() {
       referral_recipient.count += 1;

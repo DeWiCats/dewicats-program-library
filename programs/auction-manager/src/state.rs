@@ -63,6 +63,7 @@ pub struct ListingV0 {
 #[derive(Default)]
 pub struct ReferralRecipientV0 {
   pub nft: Pubkey,
+  pub listing: Pubkey,
   pub count: u64,
   pub claimed: bool,
   pub bump_seed: u8,

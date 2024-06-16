@@ -47,6 +47,7 @@ pub fn handler(
     .referral_recipient
     .set_inner(ReferralRecipientV0 {
       nft: ctx.accounts.nft.key(),
+      listing: ctx.accounts.listing.key(),
       count: 0,
       claimed: false,
       bump_seed: ctx.bumps["referral_recipient"],
