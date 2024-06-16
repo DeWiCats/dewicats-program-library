@@ -189,8 +189,13 @@ pub fn handler(ctx: Context<ExecuteSaleV0>, _args: ExecuteSaleArgsV0) -> Result<
   )?;
 
   let reward_percentage = ctx.accounts.listing.reward_percentage;
-
-  let reward_amount = ctx.accounts.highest_bid_reciept.amount / reward_percentage;
+  // if reward_percentage is 0, then reward_amount will be 0
+  // check if reward_percentage is 0
+  let reward_amount = if reward_percentage == 0 {
+    0
+  } else {
+    ctx.accounts.highest_bid_reciept.amount / reward_percentage
+  };
 
   let proceeds_amount = ctx.accounts.highest_bid_reciept.amount - reward_amount;
 
