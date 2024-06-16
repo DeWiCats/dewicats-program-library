@@ -101,7 +101,10 @@ pub fn handler(ctx: Context<PlaceBidV0>, args: PlaceBidArgsV0) -> Result<()> {
   let current_timestamp = Clock::get()?.unix_timestamp;
   let time_extension = ctx.accounts.listing.time_extension as i64;
   if end_timestamp - current_timestamp < time_extension && end_timestamp - current_timestamp > 0 {
-    ctx.accounts.listing.end_at += time_extension;
+    // Get the difference between the current time and the time extension
+    let time_extension_diff = time_extension - (end_timestamp - current_timestamp);
+    // If the difference is greater than 5 minutes, set the time extension to 5 minutes
+    ctx.accounts.listing.end_at += time_extension_diff;
   }
 
   if let Some(ref mut referral_recipient) = ctx.accounts.referral_recipient {
