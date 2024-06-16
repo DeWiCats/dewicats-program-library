@@ -6,7 +6,7 @@
     "borsh": "^0.7.0",
     "bs58": "^4.0.1"
   },
-  "description": "Exported idls for dewicats programs",
+  "description": "Exported idls for dewicats program library",
   "devDependencies": {
     "ts-loader": "^9.2.3",
     "typescript": "^5.2.2"
