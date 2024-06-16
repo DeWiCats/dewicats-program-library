@@ -509,7 +509,6 @@ describe("auction-manager", () => {
         })
         .accounts({
           auctionManager,
-          bidReciept: bidderRecieptKey(listing, bidderKeypir.publicKey)[0],
           referralRecipient: referralRecipientKey(listing, "test 2")[0],
           listing,
           tokenMint,

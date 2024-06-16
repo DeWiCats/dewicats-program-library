@@ -26,13 +26,6 @@ pub struct ClaimReferralRewardsV0<'info> {
   pub listing: Box<Account<'info, ListingV0>>,
   pub token_mint: Box<Account<'info, Mint>>,
   #[account(
-        mut,
-        has_one = listing,
-        constraint = bid_reciept.referral_recipient == Some(referral_recipient.key()),
-        constraint = bid_reciept.listing == listing.key()
-      )]
-  pub bid_reciept: Box<Account<'info, BidRecieptV0>>,
-  #[account(
         init_if_needed,
         payer = owner,
         associated_token::mint = token_mint,
