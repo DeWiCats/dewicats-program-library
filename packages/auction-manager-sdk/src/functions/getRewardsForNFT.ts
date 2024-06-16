@@ -21,7 +21,7 @@ export const getRewardsForNFT = async (
 
   const pendingRewards =
     listingSalePrice *
-    listingRewardPercentage *
+    (listingRewardPercentage / 100) *
     (referralCount / listingTotalReferralCount);
 
   return pendingRewards;
