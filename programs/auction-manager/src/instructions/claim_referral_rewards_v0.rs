@@ -58,7 +58,7 @@ pub struct ClaimReferralRewardsV0<'info> {
     )]
   pub token_source: Box<Account<'info, TokenAccount>>,
   #[account(mut,
-      constraint = referral_recipient.claimed == false,
+      constraint = !referral_recipient.claimed,
       constraint = referral_recipient.nft == nft.key()
     )]
   pub referral_recipient: Box<Account<'info, ReferralRecipientV0>>,
