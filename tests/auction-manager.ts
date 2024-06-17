@@ -532,7 +532,7 @@ describe("auction-manager", () => {
       });
       expect(referralRecipientAcc.claimed).to.eq(true);
       expect(toNumber(valsBefore[tokenMint.toBase58()], 6).toFixed(6)).to.eq(
-        "1.933334"
+        "1.400000"
       );
       expect(toNumber(vals[tokenMint.toBase58()], 6)).to.eq(2);
     });

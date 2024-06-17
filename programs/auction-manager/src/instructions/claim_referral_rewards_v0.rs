@@ -107,7 +107,8 @@ pub fn handler(
   let listing_sale = ctx.accounts.listing.bid_amount;
 
   // Calculate the reward amount based on the referral count and reward percentage and listing sale. Reward amount = ((listing sale * reward percentage) / total referral count ) * referral count
-  let reward_amount = (listing_sale / reward_percentage / total_referral_count) * referral_count;
+  let reward_amount =
+    ((listing_sale * reward_percentage) / 100 / total_referral_count) * referral_count;
 
   token::transfer(
     ctx.accounts.transfer_escrow_ctx().with_signer(&[seeds]),
