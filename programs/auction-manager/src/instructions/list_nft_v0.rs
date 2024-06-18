@@ -170,7 +170,7 @@ pub fn handler(ctx: Context<ListNftV0>, args: ListNftArgsV0) -> Result<()> {
     end_at: args.end_at,
     auction_manager: ctx.accounts.auction_manager.key(),
     created_at: Clock::get()?.unix_timestamp,
-    highest_bid_reciept: ctx.accounts.listing_authority.key(),
+    highest_bid_reciept: ctx.accounts.initial_bid_reciept.key(),
     bid_amount: args.starting_price,
     nft_escrow: ctx.accounts.nft_escrow.key(),
     total_referral_count: 0,
