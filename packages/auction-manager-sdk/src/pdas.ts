@@ -31,13 +31,13 @@ export const bidderRecieptKey = (
  */
 export const referralRecipientKey = (
   listing: PublicKey,
-  nft: PublicKey,
+  nftName: string,
   programId: PublicKey = PROGRAM_ID
 ) => {
   return PublicKey.findProgramAddressSync(
     [
       Buffer.from("referral_recipient", "utf-8"),
-      nft.toBuffer(),
+      Buffer.from(nftName, "utf-8"),
       listing.toBuffer(),
     ],
     programId

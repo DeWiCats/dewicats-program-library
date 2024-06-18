@@ -19,7 +19,10 @@ pub struct PlaceBidV0<'info> {
   pub auction_manager: Box<Account<'info, AuctionManagerV0>>,
   #[account(
         mut,
-        has_one = token_mint
+        has_one = token_mint,
+        constraint = listing.auction_manager == *auction_manager.to_account_info().key,
+        constraint = listing.token_mint == *token_mint.to_account_info().key,
+        constraint = listing.state == ListingState::Active
       )]
   pub listing: Box<Account<'info, ListingV0>>,
   pub token_mint: Box<Account<'info, Mint>>,
@@ -72,9 +75,8 @@ pub fn handler(ctx: Context<PlaceBidV0>, args: PlaceBidArgsV0) -> Result<()> {
     return Err(ErrorCode::BidAmountTooLow.into());
   }
 
-  // check that listing duration i64 and created_at timestamp is greater than current time
-  if ctx.accounts.listing.created_at + ctx.accounts.listing.duration < Clock::get()?.unix_timestamp
-  {
+  // check that listing end_at i64 and created_at timestamp is greater than current time
+  if ctx.accounts.listing.end_at < Clock::get()?.unix_timestamp {
     return Err(ErrorCode::ListingExpired.into());
   }
 
@@ -92,12 +94,31 @@ pub fn handler(ctx: Context<PlaceBidV0>, args: PlaceBidArgsV0) -> Result<()> {
   ctx.accounts.listing.bid_amount = args.amount;
   ctx.accounts.listing.highest_bid_reciept = ctx.accounts.bid_reciept.key();
   ctx.accounts.bid_reciept.state = BidRecieptState::Active;
+  ctx.accounts.bid_reciept.created_at = Clock::get()?.unix_timestamp;
+
+  // If bid is within 5 minutes of listing end, extend listing end_at to a maximum of 5 minutes
+  let end_timestamp = ctx.accounts.listing.end_at;
+  let current_timestamp = Clock::get()?.unix_timestamp;
+  let time_extension = ctx.accounts.listing.time_extension as i64;
+  if end_timestamp - current_timestamp < time_extension && end_timestamp - current_timestamp > 0 {
+    // Get the difference between the current time and the time extension
+    let time_extension_diff = time_extension - (end_timestamp - current_timestamp);
+    // If the difference is greater than 5 minutes, set the time extension to 5 minutes
+    ctx.accounts.listing.end_at += time_extension_diff;
+  }
 
   if let Some(ref mut referral_recipient) = ctx.accounts.referral_recipient {
-    referral_recipient.count += 1;
+    // Check that the referral_recipient listing is the same as the current listing
+    if referral_recipient.listing != ctx.accounts.listing.key() {
+      return Err(ErrorCode::ReferralRecipientListingMismatch.into());
+    }
+    // if ctx.accounts.bid_reciept.referral_recipient exists already then dont increase total_referral_count
+    if ctx.accounts.bid_reciept.referral_recipient.is_none() {
+      referral_recipient.count += 1;
+      ctx.accounts.listing.total_referral_count += 1;
+    }
 
     ctx.accounts.bid_reciept.referral_recipient = Some(referral_recipient.key());
-    ctx.accounts.listing.total_referral_count += 1;
   }
 
   Ok(())

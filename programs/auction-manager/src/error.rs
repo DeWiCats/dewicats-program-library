@@ -16,4 +16,10 @@ pub enum ErrorCode {
 
   #[msg("Listing is not sold")]
   ListingNotSold,
+
+  #[msg("Listing still active")]
+  ListingStillActive,
+
+  #[msg("Referral recipient listing does not match bid reciept listing")]
+  ReferralRecipientListingMismatch,
 }

@@ -5,7 +5,7 @@
     "bn.js": "^5.2.0",
     "bs58": "^4.0.1"
   },
-  "description": "Interface to the auction-manager smart contract",
+  "description": "Auction Manager SDK for PNFTs",
   "devDependencies": {
     "@types/crypto-js": "^4.1.1",
     "git-format-staged": "^2.1.3",
@@ -21,7 +21,7 @@
   "files": [
     "lib"
   ],
-  "gitHead": "5a8bf0b7b88e5934ef8d774e686f7c95804fbb8d",
+  "gitHead": "41b5fb55bdf012b6f05fd3119d29dbd92cac7a62",
   "license": "Apache-2.0",
   "main": "./lib/cjs/index.js",
   "module": "./lib/esm/src/index.js",
@@ -43,5 +43,5 @@
   },
   "sideEffects": false,
   "types": "./lib/types/src/index.d.ts",
-  "version": "0.0.4"
+  "version": "0.0.16"
 }

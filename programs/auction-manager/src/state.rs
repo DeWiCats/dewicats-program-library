@@ -7,8 +7,6 @@ pub struct AuctionManagerV0 {
   pub name: String,
   pub update_authority: Pubkey,
   pub listing_authority: Pubkey,
-  pub auction_proceeds_wallet: Pubkey,
-  pub reward_percentage: u64,
   pub bump_seed: u8,
 }
 
@@ -38,6 +36,7 @@ pub struct BidRecieptV0 {
   pub created_at: i64,
   pub state: BidRecieptState,
   pub referral_recipient: Option<Pubkey>,
+  pub bump_seed: u8,
 }
 
 #[account]
@@ -47,21 +46,27 @@ pub struct ListingV0 {
   pub nft: Pubkey,
   pub token_mint: Pubkey,
   pub starting_price: u64,
-  pub duration: i64,
+  pub end_at: i64,
   pub created_at: i64,
   pub highest_bid_reciept: Pubkey,
   pub bid_amount: u64,
   pub nft_escrow: Pubkey,
   pub total_referral_count: u64,
   pub state: ListingState,
+  pub auction_proceeds_wallet: Pubkey,
+  pub reward_percentage: u64,
+  pub time_extension: u64,
+  pub bump_seed: u8,
 }
 
 #[account]
 #[derive(Default)]
 pub struct ReferralRecipientV0 {
   pub nft: Pubkey,
+  pub listing: Pubkey,
   pub count: u64,
   pub claimed: bool,
+  pub bump_seed: u8,
 }
 
 #[macro_export]

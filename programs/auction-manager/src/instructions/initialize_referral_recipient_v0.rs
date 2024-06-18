@@ -3,7 +3,9 @@ use anchor_lang::prelude::*;
 use anchor_spl::token::Mint;
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Default)]
-pub struct InitializeReferralRecipientArgsV0 {}
+pub struct InitializeReferralRecipientArgsV0 {
+  pub nft_name: String,
+}
 
 #[derive(Accounts)]
 #[instruction(args: InitializeReferralRecipientArgsV0)]
@@ -28,7 +30,7 @@ pub struct InitializeReferralRecipientV0<'info> {
         init,
         payer = payer,
         space = 8 + 60 + std::mem::size_of::<InitializeReferralRecipientV0>(),
-        seeds = ["referral_recipient".as_bytes(), nft.key().as_ref(), listing.key().as_ref()],
+        seeds = ["referral_recipient".as_bytes(), args.nft_name.as_bytes(), listing.key().as_ref()],
         bump
     )]
   pub referral_recipient: Box<Account<'info, ReferralRecipientV0>>,
@@ -38,13 +40,17 @@ pub fn handler(
   ctx: Context<InitializeReferralRecipientV0>,
   _args: InitializeReferralRecipientArgsV0,
 ) -> Result<()> {
+  let name = _args.nft_name.trim_end_matches(char::from(0));
+  assert_eq!(name, _args.nft_name);
   ctx
     .accounts
     .referral_recipient
     .set_inner(ReferralRecipientV0 {
       nft: ctx.accounts.nft.key(),
+      listing: ctx.accounts.listing.key(),
       count: 0,
       claimed: false,
+      bump_seed: ctx.bumps["referral_recipient"],
     });
 
   Ok(())

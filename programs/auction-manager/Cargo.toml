@@ -24,4 +24,6 @@ overflow-checks = true
 bs58 = "0.3.1"
 anchor-lang = { workspace = true }
 anchor-spl = { workspace = true }
-
+mpl-token-metadata = { workspace = true  }
+mpl-token-auth-rules = { workspace = true  }
+solana-program = { workspace = true }

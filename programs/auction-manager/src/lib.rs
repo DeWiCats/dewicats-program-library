@@ -6,6 +6,7 @@ pub mod error;
 pub mod instructions;
 pub mod metaplex;
 pub mod state;
+pub mod transfer_pnft;
 
 pub use instructions::*;
 pub use state::*;
@@ -14,11 +15,18 @@ pub use state::*;
 pub mod auction_manager {
   use super::*;
 
-  pub fn initialize_manager_v0(
-    ctx: Context<InitializeManagerV0>,
-    args: InitializeManagerArgsV0,
+  pub fn initialize_auction_manager_v0(
+    ctx: Context<InitializeAuctionManagerV0>,
+    args: InitializeAuctionManagerArgsV0,
   ) -> Result<()> {
-    initialize_manager_v0::handler(ctx, args)
+    initialize_auction_manager_v0::handler(ctx, args)
+  }
+
+  pub fn update_auction_manager_v0(
+    ctx: Context<UpdateAuctionManagerV0>,
+    args: UpdateAuctionManagerArgsV0,
+  ) -> Result<()> {
+    update_auction_manager_v0::handler(ctx, args)
   }
 
   pub fn list_nft_v0(ctx: Context<ListNftV0>, args: ListNftArgsV0) -> Result<()> {
