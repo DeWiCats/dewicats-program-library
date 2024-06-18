@@ -7,6 +7,7 @@ pub mod initialize_referral_recipient_v0;
 pub mod list_nft_v0;
 pub mod place_bid_v0;
 pub mod update_auction_manager_v0;
+pub mod update_listing_v0;
 
 pub use cancel_bid_v0::*;
 pub use claim_referral_rewards_v0::*;
@@ -17,3 +18,4 @@ pub use initialize_referral_recipient_v0::*;
 pub use list_nft_v0::*;
 pub use place_bid_v0::*;
 pub use update_auction_manager_v0::*;
+pub use update_listing_v0::*;

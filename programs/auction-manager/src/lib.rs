@@ -29,6 +29,10 @@ pub mod auction_manager {
     update_auction_manager_v0::handler(ctx, args)
   }
 
+  pub fn update_listing_v0(ctx: Context<UpdateListingV0>, args: UpdateListingArgsV0) -> Result<()> {
+    update_listing_v0::handler(ctx, args)
+  }
+
   pub fn list_nft_v0(ctx: Context<ListNftV0>, args: ListNftArgsV0) -> Result<()> {
     list_nft_v0::handler(ctx, args)
   }

@@ -422,6 +422,52 @@ describe("auction-manager", () => {
       expect(cancelledBidRecieptAcc.state?.active).to.not.exist;
     });
 
+    it("allows to update listing", async () => {
+      const newProceedsWallet = Keypair.generate().publicKey;
+
+      await auctionProgram.methods
+        .updateListingV0({
+          auctionProceedsWallet: newProceedsWallet,
+          rewardPercentage: toBigNumber(50),
+        })
+        .accounts({
+          auctionManager,
+          listing,
+          updateAuthority: me,
+        })
+        .preInstructions([
+          ComputeBudgetProgram.setComputeUnitLimit({ units: 1_000_000 }),
+        ])
+        .rpcAndKeys({ skipPreflight: true });
+
+      const listingAcc = await auctionProgram.account.listingV0.fetch(listing);
+
+      expect(listingAcc.auctionProceedsWallet.toBase58()).to.eq(
+        newProceedsWallet.toBase58()
+      );
+      expect(listingAcc.rewardPercentage.toNumber()).to.eq(50);
+
+      await auctionProgram.methods
+        .updateListingV0({
+          auctionProceedsWallet: me,
+          rewardPercentage: toBigNumber(30),
+        })
+        .accounts({
+          auctionManager,
+          listing,
+          updateAuthority: me,
+        })
+        .preInstructions([
+          ComputeBudgetProgram.setComputeUnitLimit({ units: 1_000_000 }),
+        ])
+        .rpcAndKeys({ skipPreflight: true });
+
+      const listingAcc2 = await auctionProgram.account.listingV0.fetch(listing);
+
+      expect(listingAcc2.auctionProceedsWallet.toBase58()).to.eq(me.toBase58());
+      expect(listingAcc2.rewardPercentage.toNumber()).to.eq(30);
+    });
+
     it("allows to execute sale", async () => {
       const bidReciept = bidderRecieptKey(listing, bidderKeypir.publicKey)[0];
 
