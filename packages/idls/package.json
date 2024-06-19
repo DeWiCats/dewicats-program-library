@@ -6,7 +6,7 @@
     "borsh": "^0.7.0",
     "bs58": "^4.0.1"
   },
-  "description": "Exported idls for dewicats program library",
+  "description": "Exported idls for DeWiCats",
   "devDependencies": {
     "ts-loader": "^9.2.3",
     "typescript": "^5.2.2"
@@ -36,5 +36,5 @@
     "precommit": "npx git-format-staged -f 'prettier --ignore-unknown --stdin --stdin-filepath \"{}\"' ."
   },
   "sideEffects": false,
-  "version": "0.0.16"
+  "version": "0.0.17"
 }
