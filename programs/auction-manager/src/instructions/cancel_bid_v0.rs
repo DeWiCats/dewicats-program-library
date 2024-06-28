@@ -1,4 +1,4 @@
-use crate::{auction_manager_seeds, state::*};
+use crate::{auction_manager_seeds, error::ErrorCode, state::*};
 use anchor_lang::prelude::*;
 use anchor_spl::token::Mint;
 use anchor_spl::token::Transfer;
@@ -20,7 +20,8 @@ pub struct CancelBidV0<'info> {
   pub auction_manager: Box<Account<'info, AuctionManagerV0>>,
   #[account(
         mut,
-        has_one = listing
+        has_one = listing,
+        constraint = bid_reciept.state != BidRecieptState::Cancelled
       )]
   pub bid_reciept: Box<Account<'info, BidRecieptV0>>,
   pub token_mint: Box<Account<'info, Mint>>,
@@ -58,6 +59,10 @@ impl<'info> CancelBidV0<'info> {
 
 pub fn handler(ctx: Context<CancelBidV0>, _args: CancelBidArgsV0) -> Result<()> {
   let seeds = auction_manager_seeds!(ctx.accounts.auction_manager);
+  // check that the bid is cancelled
+  if ctx.accounts.bid_reciept.state == BidRecieptState::Cancelled {
+    return Err(ErrorCode::BidAlreadyCancelled.into());
+  }
   token::transfer(
     ctx.accounts.transfer_escrow_ctx().with_signer(&[seeds]),
     ctx.accounts.bid_reciept.amount,

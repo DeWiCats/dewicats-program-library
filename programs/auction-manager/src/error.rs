@@ -22,4 +22,7 @@ pub enum ErrorCode {
 
   #[msg("Referral recipient listing does not match bid reciept listing")]
   ReferralRecipientListingMismatch,
+
+  #[msg("Bid already cancelled")]
+  BidAlreadyCancelled,
 }

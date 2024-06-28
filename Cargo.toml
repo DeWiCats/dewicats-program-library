@@ -3,6 +3,9 @@ members = [
   "programs/*",
 ]
 
+[profile.release]
+overflow-checks = true
+
 [workspace.dependencies]
 anchor-lang = { version = "0.28.0", features = ["init-if-needed"] }
 anchor-spl = { version = "0.28.0", features = ["mint", "token"] }
