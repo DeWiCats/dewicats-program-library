@@ -25,4 +25,7 @@ pub enum ErrorCode {
 
   #[msg("Bid already cancelled")]
   BidAlreadyCancelled,
+
+  #[msg("Referral recipient is not the same as the previous referral recipient")]
+  ReferralRecipientDifferentThanPrevious,
 }
