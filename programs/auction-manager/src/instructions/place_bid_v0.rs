@@ -80,8 +80,11 @@ pub fn handler(ctx: Context<PlaceBidV0>, args: PlaceBidArgsV0) -> Result<()> {
     return Err(ErrorCode::ListingExpired.into());
   }
 
+  // we need the previous bid amount, if it exists, for later
+  let mut prev_amount = 0;
   // only transfer escrow the remaining amount if a bid reciept has already been created
   if ctx.accounts.bid_reciept.state == BidRecieptState::Active {
+    prev_amount = ctx.accounts.bid_reciept.amount;
     token::transfer(
       ctx.accounts.transfer_escrow_ctx(),
       args.amount - ctx.accounts.bid_reciept.amount,
@@ -112,13 +115,28 @@ pub fn handler(ctx: Context<PlaceBidV0>, args: PlaceBidArgsV0) -> Result<()> {
     if referral_recipient.listing != ctx.accounts.listing.key() {
       return Err(ErrorCode::ReferralRecipientListingMismatch.into());
     }
-    // if ctx.accounts.bid_reciept.referral_recipient exists already then dont increase total_referral_count
-    if ctx.accounts.bid_reciept.referral_recipient.is_none() {
-      referral_recipient.count += 1;
-      ctx.accounts.listing.total_referral_count += 1;
+    // Check that the referral_recipient is the same as potential previous referral_recipient
+    if let Some(prev_referral) = ctx.accounts.bid_reciept.referral_recipient {
+      if prev_referral != referral_recipient.key() {
+        return Err(ErrorCode::ReferralRecipientDifferentThanPrevious.into());
+      }
     }
+    // It's allowed to have a referral receipt when there previously was none, but we need to clear
+    // the previous amount so that we don't subtract it.
+    if ctx.accounts.bid_reciept.referral_recipient.is_none() {
+      prev_amount = 0;
+    }
+    // Prev amount will be 0 if there was no prev_amount. Subtract after addition to avoid underflow
+    // as we know `args.amount > prev_amount`
+    referral_recipient.count += args.amount;
+    referral_recipient.count -= prev_amount;
+    ctx.accounts.listing.total_referral_count += args.amount;
+    ctx.accounts.listing.total_referral_count -= prev_amount;
 
     ctx.accounts.bid_reciept.referral_recipient = Some(referral_recipient.key());
+  } else if ctx.accounts.bid_reciept.referral_recipient.is_some() {
+    // If previous bid had a referral recipient but this bid does not, throw an error
+    return Err(ErrorCode::ReferralRecipientInBidRecieptButNewBidHasNoReferralRecipient.into());
   }
 
   Ok(())
