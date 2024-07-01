@@ -121,15 +121,22 @@ pub fn handler(ctx: Context<PlaceBidV0>, args: PlaceBidArgsV0) -> Result<()> {
         return Err(ErrorCode::ReferralRecipientDifferentThanPrevious.into());
       }
     }
-
-    // Prev amount will be 0 if there was no prev amount. Subtract after addition to avoid underflow
-    // as we know `args.mount > prev_amount`
+    // It's allowed to have a referral receipt when there previously was none, but we need to clear
+    // the previous amount so that we don't subtract it.
+    if ctx.accounts.bid_reciept.referral_recipient.is_none() {
+      prev_amount = 0;
+    }
+    // Prev amount will be 0 if there was no prev_amount. Subtract after addition to avoid underflow
+    // as we know `args.amount > prev_amount`
     referral_recipient.count += args.amount;
     referral_recipient.count -= prev_amount;
     ctx.accounts.listing.total_referral_count += args.amount;
     ctx.accounts.listing.total_referral_count -= prev_amount;
 
     ctx.accounts.bid_reciept.referral_recipient = Some(referral_recipient.key());
+  } else if ctx.accounts.bid_reciept.referral_recipient.is_some() {
+    // If previous bid had a referral recipient but this bid does not, throw an error
+    return Err(ErrorCode::ReferralRecipientInBidRecieptButNewBidHasNoReferralRecipient.into());
   }
 
   Ok(())

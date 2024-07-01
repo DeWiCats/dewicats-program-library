@@ -28,4 +28,7 @@ pub enum ErrorCode {
 
   #[msg("Referral recipient is not the same as the previous referral recipient")]
   ReferralRecipientDifferentThanPrevious,
+
+  #[msg("Referral recipient in bid reciept but new bid has no referral recipient")]
+  ReferralRecipientInBidRecieptButNewBidHasNoReferralRecipient,
 }

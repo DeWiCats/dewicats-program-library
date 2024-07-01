@@ -334,7 +334,7 @@ describe("auction-manager", () => {
           referralRecipientKey(listing, "test 2")[0]
         );
 
-      expect(listingAcc.totalReferralCount.toNumber()).to.eq(1);
+      expect(listingAcc.totalReferralCount.toNumber()).to.eq(100000 * 8);
       expect(newBidRecieptAcc.bidder.toBase58()).to.eq(
         bidderKeypir.publicKey.toBase58()
       );
@@ -343,7 +343,7 @@ describe("auction-manager", () => {
       expect(newBidRecieptAcc.referralRecipient?.toBase58()).to.eq(
         referralRecipientKey(listing, "test 2")[0].toBase58()
       );
-      expect(referralRecipientAcc.count.toNumber()).to.eq(1);
+      expect(referralRecipientAcc.count.toNumber()).to.eq(100000 * 8);
     });
 
     it("allows to cancel bid", async () => {
@@ -359,7 +359,8 @@ describe("auction-manager", () => {
           auctionManager,
           bidReciept,
           payer: bidderKeypir.publicKey,
-          referralRecipient: null,
+          // we must continue referring to be valid
+          referralRecipient: referralRecipientKey(listing, "test 2")[0],
         })
         .transaction();
 
@@ -481,7 +482,8 @@ describe("auction-manager", () => {
           auctionManager,
           bidReciept,
           payer: bidderKeypir.publicKey,
-          referralRecipient: null,
+          // we must continue referring to be valid
+          referralRecipient: referralRecipientKey(listing, "test 2")[0],
         })
         .transaction();
 
@@ -548,7 +550,7 @@ describe("auction-manager", () => {
         valsBefore[accountData.mint.toBase58()] = accountData.amount;
       });
 
-      // get tokenn balance
+      // get token balance
       await auctionProgram.methods
         .claimReferralRewardsV0({
           recipientWallet: me,
